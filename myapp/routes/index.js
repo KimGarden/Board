@@ -23,17 +23,35 @@ db.query(`SELECT now() AS today`, function (error, results) {
     }
 });
 
+router.get("/", function (req, res, next) {
+    let msg = "";
+    msg = temp.checkPassword();
+    res.send(msg);
+});
+
 /* GET home page. */
-router.get("/login/:userId", function (req, res, next) {
-    db.query(`SELECT * FROM user WHERE id=?`, [req.params.userId], function (error, results) {
+router.post("/logincheck", function (req, res, next) {
+    let userId = req.body.userId;
+    let userPassword = req.body.userPassword;
+    db.query(`SELECT * FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
             throw error;
         } else {
             if (results.length == 0) {
-                res.send("등록되지 않은 유저");
+                res.write("<script language='javascript'>alert('Incorrect Id')</script>");
+                res.write(
+                    "<script language='javascript'>window.location='" + conf.Address + "'</script>"
+                );
             } else {
-                msg = temp.checkPassword(results[0].name, results[0].id);
-                res.send(msg);
+                res.send(`
+                <form name="form" action="${conf.Address}login" method="post">
+                    <input type="hidden" name="userId" value="${userId}">
+                    <input type="hidden" name="userPassword" value="${userPassword}">
+                    <input type="hidden" name="userName" value="${results[0].name}">
+                </form>
+                <script language="javascript">
+                    document.form.submit();
+                </script>`);
             }
         }
     });
@@ -223,13 +241,9 @@ router.post("/login", function (req, res, next) {
                     } // result2 function 종료
                 ); // result2 query문 종료
             } else {
-                res.write("<script language='javascript'>alert('incorrect password')</script>");
+                res.write("<script language='javascript'>alert('Incorrect Password')</script>");
                 res.write(
-                    "<script language='javascript'>window.location='" +
-                        conf.Address +
-                        "login/" +
-                        userId +
-                        "'</script>"
+                    "<script language='javascript'>window.location='" + conf.Address + "'</script>"
                 );
             }
         }

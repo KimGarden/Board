@@ -1,6 +1,6 @@
 var conf = require("../lib/conf");
 module.exports = {
-    checkPassword: function (userName, userId) {
+    checkPassword: function () {
         let template = `
         <!DOCTYPE html>
         <html lang="ko">
@@ -17,12 +17,14 @@ module.exports = {
             <body>
                 <div class="text-center">
                     <div class="text-3xl mb-5 mt-16 text-blue-700 font-black">
-                        ${userName}님 비밀번호를 입력해주세요
+                        아이디와 비밀번호를 입력해주세요
                     </div>
                     <div>
-                        <form action="${conf.Address}login" method="post">
-                            <input type="hidden" name="userId" value=${userId}>
-                            <input type="hidden" name="userName" value=${userName}>
+                        <form action="${conf.Address}logincheck" method="post">
+                            <div class="text-center">
+                                <input type="text" name="userId" placeholder="아이디"
+                                class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
+                            </div>
                             <div class="text-center">
                                 <input type="text" name="userPassword" placeholder="비밀번호"
                                 class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
