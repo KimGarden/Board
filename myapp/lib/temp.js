@@ -16,7 +16,7 @@ module.exports = {
             </head>
             <body>
                 <div class="text-center">
-                    <div class="text-3xl mb-5 mt-16 text-blue-700 font-black">
+                    <div class="text-3xl mb-5 mt-14 text-blue-700 font-black">
                         아이디와 비밀번호를 입력해주세요
                     </div>
                     <div>
@@ -33,6 +33,44 @@ module.exports = {
                                 <button type="submit"
                                 class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
                                 로그인
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="text-3xl mb-5 mt-24 text-green-700 font-black">
+                        교수님 비밀번호를 입력해주세요
+                    </div>
+                    <div>
+                        <form action="${conf.Address}pro" method="post" class="mt-3">
+                            <div>
+                                <div class="text-center">
+                                    <input type="text" name="userPassword" placeholder="비밀번호"
+                                    class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
+                                </div>
+                                <button type="submit"
+                                class="md:w-40 bg-green-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-green-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+                                교수님 로그인
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="text-3xl mb-5 mt-24 text-red-700 font-black">
+                        설정 버튼
+                    </div>
+                    <div>
+                        <form action="${conf.Address}resetData" method="post" class="mt-3">
+                            <div>
+                                <div class="text-center">
+                                    <input type="text" name="date" placeholder="YYYY-MM-DD"
+                                    class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
+                                </div>
+                                <div class="text-center">
+                                    <input type="text" name="userPassword" placeholder="비밀번호"
+                                    class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
+                                </div>
+                                <button type="submit"
+                                class="md:w-40 bg-red-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-red-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+                                누르지 마세요
                                 </button>
                             </div>
                         </form>
@@ -204,10 +242,9 @@ module.exports = {
         <div class="text-center mt-24">
         <h1 class="font-black text-3xl mb-3">${date}</h1>
         <h1 class="font-black text-lg text-red-500">확인하실 날짜를 포멧에 맞춰 입력해주세요</h1>
-        <h1 class="font-black text-sm mb-3 text-red-300">(YYYY-MM-DD)</h1>
             <form action="${conf.Address}changeDate" method="post" class="text-center">
                 <div class="text-center">
-                    <input type="text" name="date" placeholder="날짜"
+                    <input type="text" name="date" placeholder="YYYY-MM-DD"
                     class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                 </div>
                 <div>

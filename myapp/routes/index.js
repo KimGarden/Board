@@ -335,8 +335,14 @@ router.post("/leave", function (req, res, next) {
     });
 });
 
-router.get("/pro", function (req, res, next) {
-    res.redirect(`${conf.Address}pro/${today}`);
+router.post("/pro", function (req, res, next) {
+    let userPassword = req.body.userPassword;
+    if (userPassword == conf.professor) {
+        res.redirect(`${conf.Address}pro/${today}`);
+    } else {
+        res.write("<script language='javascript'>alert('Incorrect Password')</script>");
+        res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
+    }
 });
 
 router.get("/pro/:date", function (req, res, next) {
@@ -601,65 +607,39 @@ router.post("/checkInfo", function (req, res, next) {
     });
 });
 
-router.get("/reset", function (req, res, next) {
-    res.send(
-        `   
-            <!DOCTYPE html>
-            <html lang="ko">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>Garden's Graden</title>
-                <meta name="description" content="">
-                <meta name="keywords" content="">
-                <meta name="author" content="">
-                <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
-            </head>
-            <body>
-                <div class="text-center">
-                    <div class="text-3xl mb-5 mt-16 text-red-500 font-black">
-                        삭제 페이지입니다
-                    </div>
-                    <div>
-                        <form action="${conf.Address}resetData" method="post">
-                            <div class="text-center">
-                                <input type="text" name="date" placeholder="날짜"
-                                class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <button type="submit"
-                                class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
-                                초기화
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </body>
-        `
-    );
-});
-
 router.post("/resetData", function (req, res, next) {
     let date = req.body.date;
+    let userPassword = req.body.userPassword;
 
-    db.query(`SELECT * FROM user`, function (error, results) {
-        for (let i = 0; i < results.length; i++) {
-            db.query(`INSERT INTO countrecord(userId, countRecord, date) VALUES (?, ?, ?)`, [
-                results[i].id,
-                results[i].count,
-                date,
-            ]);
-        }
-        db.query(`UPDATE user SET count=0, inClass=1, lastReason=""`, function (error2, results2) {
-            if (error2) {
-                throw error2;
-            } else {
-                res.send("OK");
+    if (userPassword == conf.reset) {
+        db.query(`SELECT * FROM user`, function (error, results) {
+            for (let i = 0; i < results.length; i++) {
+                db.query(`INSERT INTO countrecord(userId, countRecord, date) VALUES (?, ?, ?)`, [
+                    results[i].id,
+                    results[i].count,
+                    date,
+                ]);
             }
+            db.query(
+                `UPDATE user SET count=0, inClass=1, lastReason=""`,
+                function (error2, results2) {
+                    if (error2) {
+                        throw error2;
+                    } else {
+                        res.write("<script language='javascript'>alert('Success')</script>");
+                        res.write(
+                            "<script language='javascript'>window.location='" +
+                                conf.Address +
+                                "'</script>"
+                        );
+                    }
+                }
+            );
         });
-    });
+    } else {
+        res.write("<script language='javascript'>alert('Fail')</script>");
+        res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
+    }
 });
 
 router.post("/changeDate", function (req, res, next) {
