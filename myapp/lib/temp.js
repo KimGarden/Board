@@ -84,7 +84,7 @@ module.exports = {
     
                 <div class="p-4 text-center">
                     <div class="block rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center"
-                        style="background-image: url('${conf.Address}images/react.png')"></div>
+                        style="background-image: url('${conf.Address}images/title.PNG')"></div>
                     <h1 class="text-3xl font-bold pt-8 text-center">${userName}</h1>
                     <div class="mx-auto w-full pt-3 border-b-2 border-green-500 opacity-25"></div>
                     
