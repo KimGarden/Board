@@ -61,10 +61,13 @@ router.post("/login", function (req, res, next) {
     const userName = req.body.userName;
     const userId = req.body.userId;
     const userPassword = req.body.userPassword;
+    const time = req.body.time;
     let resultHTML = "";
     let info = "";
     let inOut = "";
     let allList = "";
+    let sumTime1 = 0;
+    let sumTime2 = 0;
 
     db.query(`SELECT password FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
@@ -87,12 +90,12 @@ router.post("/login", function (req, res, next) {
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
                                     let timeIn = arrIn[1].split(":");
-                                    let result = (
+                                    sumTime1 = Math.floor(
                                         ((timeIn[0] - timeOut[0]) * 3600 +
                                             (timeIn[1] - timeOut[1]) * 60 +
                                             (timeIn[2] - timeOut[2])) /
-                                        60
-                                    ).toFixed(1);
+                                            60
+                                    );
                                     today += `
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-6 py-4 text-left whitespace-nowrap">
@@ -116,10 +119,16 @@ router.post("/login", function (req, res, next) {
                                                 <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
-                                                        ${result}분
+                                                        ${sumTime1}분
                                                     </span>
                                                 </td>
                                             </tr>`;
+                                }
+                                if (time != undefined) {
+                                    db.query(`UPDATE user SET time=? WHERE id=?`, [
+                                        Number(time) + sumTime1,
+                                        userId,
+                                    ]);
                                 }
                             } else {
                                 for (let i = 0; i < results2.length - 1; i += 2) {
@@ -127,12 +136,12 @@ router.post("/login", function (req, res, next) {
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
                                     let timeIn = arrIn[1].split(":");
-                                    let result = (
+                                    sumTime2 = Math.floor(
                                         ((timeIn[0] - timeOut[0]) * 3600 +
                                             (timeIn[1] - timeOut[1]) * 60 +
                                             (timeIn[2] - timeOut[2])) /
-                                        60
-                                    ).toFixed(1);
+                                            60
+                                    );
                                     today += `
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-6 py-4 text-left whitespace-nowrap">
@@ -156,7 +165,7 @@ router.post("/login", function (req, res, next) {
                                                 <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
-                                                        ${result}분
+                                                        ${sumTime2}분
                                                     </span>
                                                 </td>
                                             </tr>`;
@@ -255,29 +264,36 @@ router.post("/enter", function (req, res, next) {
     const userPassword = req.body.userPassword;
     const userName = req.body.userName;
 
-    db.query(`UPDATE user SET inClass=1 WHERE id=?`, [userId], function (error, results) {
+    db.query(`SELECT time FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
             throw error;
         } else {
-            db.query(
-                `INSERT INTO checktime(userId, time, reason, date) VALUES(?, now(), "", ?)`,
-                [userId, today],
-                function (error2, result2) {
-                    if (error2) {
-                        throw error2;
-                    } else {
-                        res.send(`
-                        <form name="form" action="${conf.Address}login" method="post">
-                            <input type="hidden" name="userId" value="${userId}">
-                            <input type="hidden" name="userPassword" value="${userPassword}">
-                            <input type="hidden" name="userName" value="${userName}">
-                        </form>
-                        <script language="javascript">
-                            document.form.submit();
-                        </script>`);
-                    }
+            db.query(`UPDATE user SET inClass=1 WHERE id=?`, [userId], function (error2, results2) {
+                if (error2) {
+                    throw error2;
+                } else {
+                    db.query(
+                        `INSERT INTO checktime(userId, time, reason, date) VALUES(?, now(), "", ?)`,
+                        [userId, today],
+                        function (error3, result3) {
+                            if (error3) {
+                                throw error3;
+                            } else {
+                                res.send(`
+                                <form name="form" action="${conf.Address}login" method="post">
+                                    <input type="hidden" name="userId" value="${userId}">
+                                    <input type="hidden" name="userPassword" value="${userPassword}">
+                                    <input type="hidden" name="userName" value="${userName}">
+                                    <input type="hidden" name="time" value="${results[0].time}">
+                                </form>
+                                <script language="javascript">
+                                    document.form.submit();
+                                </script>`);
+                            }
+                        }
+                    );
                 }
-            );
+            });
         }
     });
 });
@@ -349,6 +365,12 @@ router.get("/pro/:date", function (req, res, next) {
     let resultHTML = "";
     let allList = "";
     let chart = "";
+    let rank = "";
+
+    let monthlyArrRecord = [];
+    let nameArrRecord = [];
+    let monthlyArrTime = [];
+    let nameArrTime = [];
 
     db.query(`SELECT * FROM user`, function (error, result) {
         if (error) {
@@ -448,8 +470,124 @@ router.get("/pro/:date", function (req, res, next) {
                             let title = req.params.date + " 부재 현황 그래프";
                             chart = temp.chart(title, myChart);
                         }
-                        resultHTML = temp.main("", "", allList, chart);
-                        res.send(resultHTML);
+                        db.query(
+                            "SELECT * FROM countrecord WHERE month=?",
+                            [month],
+                            function (error3, results3) {
+                                if (error3) {
+                                    throw error3;
+                                } else {
+                                    db.query(`SELECT * FROM user`, function (error4, results4) {
+                                        if (error4) {
+                                            throw error4;
+                                        } else {
+                                            let day = results3.length / results4.length;
+                                            for (let i = 0; i < results4.length; i++) {
+                                                nameArrRecord[i] = results4[i].name;
+                                                monthlyArrRecord[i] = 0;
+                                                nameArrTime[i] = results4[i].name;
+                                                monthlyArrTime[i] = 0;
+                                            }
+
+                                            let cntRecord = 0;
+                                            for (let i = 1; i <= day; i++) {
+                                                for (let j = 1; j <= results4.length; j++) {
+                                                    monthlyArrRecord[j - 1] +=
+                                                        results3[cntRecord++].countRecord;
+                                                }
+                                            }
+
+                                            let cntTime = 0;
+                                            for (let i = 1; i <= day; i++) {
+                                                for (let j = 1; j <= results4.length; j++) {
+                                                    monthlyArrTime[j - 1] +=
+                                                        results3[cntTime++].countTime;
+                                                }
+                                            }
+
+                                            let tempRecord1;
+                                            let tempRecord2;
+                                            for (let i = 0; i < nameArrRecord.length - 1; i++) {
+                                                for (let j = i + 1; j < nameArrRecord.length; j++) {
+                                                    if (monthlyArrRecord[i] < monthlyArrRecord[j]) {
+                                                        tempRecord1 = monthlyArrRecord[i];
+                                                        monthlyArrRecord[i] = monthlyArrRecord[j];
+                                                        monthlyArrRecord[j] = tempRecord1;
+                                                        tempRecord2 = nameArrRecord[i];
+                                                        nameArrRecord[i] = nameArrRecord[j];
+                                                        nameArrRecord[j] = tempRecord2;
+                                                    }
+                                                }
+                                            }
+
+                                            let tempTime1;
+                                            let tempTime2;
+                                            for (let i = 0; i < nameArrTime.length - 1; i++) {
+                                                for (let j = i + 1; j < nameArrTime.length; j++) {
+                                                    if (monthlyArrTime[i] < monthlyArrTime[j]) {
+                                                        tempTime1 = monthlyArrTime[i];
+                                                        monthlyArrTime[i] = monthlyArrTime[j];
+                                                        monthlyArrTime[j] = tempTime1;
+                                                        tempTime2 = nameArrTime[i];
+                                                        nameArrTime[i] = nameArr[j];
+                                                        nameArrTime[j] = tempTime2;
+                                                    }
+                                                }
+                                            }
+
+                                            let rankMsgRecord = "";
+                                            let rankMsgTime = "";
+                                            let rankMark = [
+                                                "&#129351",
+                                                "&#129352",
+                                                "&#129353",
+                                                "",
+                                                "",
+                                            ];
+                                            for (let i = 0; i < 5; i++) {
+                                                rankMsgRecord += `
+                                                    <div class="mt-2">
+                                                        <table class="w-full">
+                                                            <tr>
+                                                                <td class="w-4/12 text-right font-black text-sm text-blue-700">${
+                                                                    rankMark[i]
+                                                                } ${i + 1}등</td>
+                                                                <td class="w-4/12 text-center font-black text-sm">${
+                                                                    nameArrRecord[i]
+                                                                } 학생</td>
+                                                                <td class="w-4/12 text-left font-black text-sm text-red-500 text-sm">${
+                                                                    monthlyArrRecord[i]
+                                                                }번</td>
+                                                            <tr>
+                                                        </table>
+                                                    </div>
+                                                `;
+                                                rankMsgTime += `
+                                                    <div class="mt-2">
+                                                        <table class="w-full">
+                                                            <tr>
+                                                                <td class="w-4/12 text-right font-black text-sm text-blue-700">${
+                                                                    rankMark[i]
+                                                                } ${i + 1}등</td>
+                                                                <td class="w-4/12 text-center font-black text-sm">${
+                                                                    nameArrTime[i]
+                                                                } 학생</td>
+                                                                <td class="w-4/12 text-left font-black text-sm text-red-500">${
+                                                                    monthlyArrTime[i]
+                                                                }분</td>
+                                                            <tr>
+                                                        </table>
+                                                    </div>
+                                                `;
+                                            }
+                                            rank = temp.rank(rankMsgRecord, rankMsgTime, month);
+                                            resultHTML = temp.main(rank, "", allList, chart);
+                                            res.send(resultHTML);
+                                        }
+                                    });
+                                }
+                            }
+                        );
                     }
                 }
             );
@@ -610,23 +748,25 @@ router.post("/checkInfo", function (req, res, next) {
 router.post("/resetData", function (req, res, next) {
     let date = req.body.date;
     let userPassword = req.body.userPassword;
+    let arr = date.split("-");
 
     if (userPassword == conf.reset) {
         db.query(`SELECT * FROM user`, function (error, results) {
             for (let i = 0; i < results.length; i++) {
-                db.query(`INSERT INTO countrecord(userId, countRecord, date) VALUES (?, ?, ?)`, [
-                    results[i].id,
-                    results[i].count,
-                    date,
-                ]);
+                db.query(
+                    `INSERT INTO countrecord(userId, countRecord, countTime, date, year, month, day) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                    [results[i].id, results[i].count, results[i].time, date, arr[0], arr[1], arr[2]]
+                );
             }
             db.query(
-                `UPDATE user SET count=0, inClass=1, lastReason=""`,
+                `UPDATE user SET count=0, inClass=1, lastReason="", time=0`,
                 function (error2, results2) {
                     if (error2) {
                         throw error2;
                     } else {
-                        res.write("<script language='javascript'>alert('Success')</script>");
+                        res.write(
+                            "<script language='javascript'>alert('Setup successful')</script>"
+                        );
                         res.write(
                             "<script language='javascript'>window.location='" +
                                 conf.Address +
@@ -637,7 +777,7 @@ router.post("/resetData", function (req, res, next) {
             );
         });
     } else {
-        res.write("<script language='javascript'>alert('Fail')</script>");
+        res.write("<script language='javascript'>alert('Don't click this button')</script>");
         res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
     }
 });

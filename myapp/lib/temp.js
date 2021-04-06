@@ -8,15 +8,15 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>Garden's Graden</title>
+                <title>WD3J 외출 현황</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
                 <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
             </head>
-            <body>
+            <body class="bg-blue-100">
                 <div class="text-center">
-                    <div class="text-3xl mb-5 mt-14 text-blue-700 font-black">
+                    <div class="text-3xl mb-5 mt-20 text-blue-700 font-black">
                         아이디와 비밀번호를 입력해주세요
                     </div>
                     <div>
@@ -26,7 +26,7 @@ module.exports = {
                                 class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                             </div>
                             <div class="text-center">
-                                <input type="text" name="userPassword" placeholder="비밀번호"
+                                <input type="password" name="userPassword" placeholder="비밀번호"
                                 class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                             </div>
                             <div>
@@ -44,7 +44,7 @@ module.exports = {
                         <form action="${conf.Address}pro" method="post" class="mt-3">
                             <div>
                                 <div class="text-center">
-                                    <input type="text" name="userPassword" placeholder="비밀번호"
+                                    <input type="password" name="userPassword" placeholder="비밀번호"
                                     class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                                 </div>
                                 <button type="submit"
@@ -65,7 +65,7 @@ module.exports = {
                                     class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                                 </div>
                                 <div class="text-center">
-                                    <input type="text" name="userPassword" placeholder="비밀번호"
+                                    <input type="password" name="userPassword" placeholder="비밀번호"
                                     class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
                                 </div>
                                 <button type="submit"
@@ -91,7 +91,7 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>Garden's Graden</title>
+                <title>WD3J 외출 현황</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
@@ -120,7 +120,6 @@ module.exports = {
         msg = `
         <div id="profile" class="max-w-4xl flex items-center h-auto flex-wrap mx-auto my-32">
             <div class="w-full rounded-lg shadow-2xl bg-white opacity-75 mx-6">
-    
     
                 <div class="p-4 text-center">
                     <div class="block rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center"
@@ -178,7 +177,7 @@ module.exports = {
     },
     in: function (userId, userPassword, userName) {
         msg = `
-        <div class="text-center mt-24">
+        <div class="text-center mt-16 mb-36">
             <h1 class="font-black text-3xl mb-3">현황 갱신</h1>
             <h1 class="font-black mb-3 text-red-500 text-xs">교실로 돌아오셨으면 아래의 버튼을 눌러주세요<h1>
             <div class="mb-24">
@@ -200,7 +199,7 @@ module.exports = {
     },
     out: function (userId, userPassword, userName) {
         msg = `
-        <div class="text-center mt-24">
+        <div class="text-center mt-16 mb-36">
             <h1 class="font-black text-3xl mb-2">현황 갱신</h1>
             <h1 class="font-black mb-3 text-red-500 text-xs">현재 외출하는 이유를 간략하게 작성해주세요<h1>
             <div class="mb-24">
@@ -262,6 +261,100 @@ module.exports = {
         </div>
         ${chart}
         `;
+        return msg;
+    },
+    rank: function (many, long, month) {
+        let msg = `
+        <div class="flex text-center">
+            <div class="w-2/12">
+            </div>
+            <div class="w-4/12 mb-10">
+                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 횟수 상위 5인 &#128400<h1>
+                ${many}
+            </div>
+            <div class="w-4/12 mb-10">
+                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 시간 상위 5인 &#128400<h1>
+                ${long}
+            </div>
+            <div class="w-2/12">
+            </div>
+        </div>
+        `;
+
+        return msg;
+    },
+    bulletin: function (boardTable) {
+        let msg = `<div id="board">
+        <!-- Main content header -->
+        <div class="mx-24 pt-3">
+            <div class="flex flex-col mb-7 mt-12 items-start justify-center space-y-4 border-b lg:items-center lg:space-y-0 lg:flex-row">
+                <h1 class="text-2xl font-semibold whitespace-nowrap text-gray-500">My board</h1>
+                <a class="m-2 block p-1.5 rounded-full transform transition hover:-rotate-12 duration-500" href="./modify/board">
+                    <svg class="h-6 fill-current h-8 w-8 text-black hover:text-red-700" role="img"
+                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex h-screen overflow-y-hidden bg-gray-200 px-16 pt-5 pb-16">
+
+            <div class="flex flex-col flex-1 h-5/6 overflow-hidden">
+                <!-- Main content -->
+                <main class="flex-1 max-h-full p-5 overflow-hidden overflow-y-scroll" id="boardBox">
+                    <div class="flex flex-col">
+                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                            <div class="inline-block min-w-full pb-2 align-middle sm:px-6 lg:px-8">
+                                <div class="overflow-hidden border-b border-gray-200 rounded-md shadow-md">
+                                    <table class="min-w-full overflow-x-scroll divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                                    Title
+                                                </th>
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                                    Category
+                                                </th>
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                                                    Date
+                                                </th>
+                                                <th scope="col" class="relative px-6 py-3">
+                                                    <span class="sr-only">Edit</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            
+                                            ${boardTable}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.3/dist/alpine.min.js" defer></script>
+            <script>
+                const setup = () => {
+                    return {
+                        loading: true,
+                        isSidebarOpen: false,
+                        toggleSidbarMenu() {
+                            this.isSidebarOpen = !this.isSidebarOpen
+                        },
+                        isSettingsPanelOpen: false,
+                        isSearchBoxOpen: false,
+                    }
+                }
+            </script>
+        </div>`;
+
         return msg;
     },
 };
