@@ -274,13 +274,13 @@ router.post("/login", function (req, res, next) {
                                                                 bulletinMsg += `
                                                                 <tr class="transition-all hover:bg-gray-100 hover:shadow-lg" onClick="location.href='${conf.Address}board/${results5[i].id}'">
                                                                     <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
-                                                                        <a class="cursor-default text-sm text-gray-900">${results5[i].date}</a>
-                                                                    </td>
-                                                                    <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
                                                                         <span
                                                                             class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                                                             ${results5[i].title}
                                                                         </span>
+                                                                    </td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
+                                                                        <a class="cursor-default text-sm text-gray-900">${results5[i].date}</a>
                                                                     </td>
                                                                 </tr>
                                                                 `;

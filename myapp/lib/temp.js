@@ -240,7 +240,7 @@ module.exports = {
     },
     chart: function (date, chart) {
         msg = `
-        <div class="text-center mt-24">
+        <div class="text-center mt-32">
         <h1 class="font-black text-3xl mb-3">${date}</h1>
         <h1 class="font-black text-lg text-red-500">확인하실 날짜를 포멧에 맞춰 입력해주세요</h1>
             <form action="${conf.Address}changeDate" method="post" class="text-center">
@@ -262,7 +262,8 @@ module.exports = {
             </div>
         </div>
         ${chart}
-        <form action="${conf.Address}upload" method="post" enctype="multipart/form-data">
+        <form action="${conf.Address}upload" method="post" enctype="multipart/form-data" class="mt-32">
+            <h1 class="font-black text-3xl mb-7">게시글 작성</h1>
             <h1>제목</h1>
             <div>
                 <input type="text" name="title" class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
@@ -271,11 +272,12 @@ module.exports = {
             <div>
                 <textarea name="content" class="w-80 h-96 mt-2 py-3 px-3 overflow-y-auto rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none resize-none"></textarea>
             </div>
+            <h1 class="font-black text-base text-red-500">파일은 한 번에 3개까지만 선택해 주세요</h1>
             <div class="text-center">
                 <input type="file" id="file" name="file" multiple>
             </div>
             <div>
-                <input type="submit" value="작성" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+                <input type="submit" value="작성" class="mb-16 md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
             </div>
         </form>
         `;
@@ -283,7 +285,7 @@ module.exports = {
     },
     rank: function (many, long, month) {
         let msg = `
-        <div class="flex text-center">
+        <div class="flex text-center mb-24 mt-10">
             <div class="w-2/12">
             </div>
             <div class="w-4/12 mb-10">
@@ -302,8 +304,9 @@ module.exports = {
         return msg;
     },
     bulletin: function (boardTable) {
-        let msg = `<div class="w-full text-center flex">
+        let msg = `<div class="w-full text-center flex mt-28 mb-16">
                     <div class="flex-1 w-6/12 p-5 overflow-hidden overflow-y-scroll text-center m-0" id="boardBox">
+                        <h1 class="font-black text-3xl mb-3">게시판</h1>
                         <div class="flex flex-col">
                             <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                 <div class="inline-block w-6/12 py-10 align-middle">
@@ -312,12 +315,12 @@ module.exports = {
                                             <thead class="bg-gray-50">
                                                 <tr>
                                                     <th scope="col"
-                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-3/12">
-                                                        Date
+                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-6/12">
+                                                        Title
                                                     </th>
                                                     <th scope="col"
-                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-9/12">
-                                                        Title
+                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-6/12">
+                                                        Date
                                                     </th>
                                                 </tr>
                                             </thead>
