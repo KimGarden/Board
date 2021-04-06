@@ -82,7 +82,7 @@ module.exports = {
 
         return template;
     },
-    main: function (info, inOut, allList, chart) {
+    main: function (info, inOut, allList, chart, bulletin) {
         // class="bg-gradient-to-r from-gray-200 to-gray-400"
         msg = `
         <!DOCTYPE html>
@@ -109,6 +109,8 @@ module.exports = {
                 ${allList}
 
                 ${chart}
+
+                ${bulletin}
 
             </body>
         </html>
@@ -260,6 +262,22 @@ module.exports = {
             </div>
         </div>
         ${chart}
+        <form action="${conf.Address}upload" method="post" enctype="multipart/form-data">
+            <h1>제목</h1>
+            <div>
+                <input type="text" name="title" class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none">
+            </div>
+            <h1>내용</h1>
+            <div>
+                <textarea name="content" class="w-80 h-96 mt-2 py-3 px-3 overflow-y-auto rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none resize-none"></textarea>
+            </div>
+            <div class="text-center">
+                <input type="file" id="file" name="file" multiple>
+            </div>
+            <div>
+                <input type="submit" value="작성" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+            </div>
+        </form>
         `;
         return msg;
     },
@@ -269,11 +287,11 @@ module.exports = {
             <div class="w-2/12">
             </div>
             <div class="w-4/12 mb-10">
-                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 횟수 상위 5인 &#128400<h1>
+                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 [횟수] 상위 5인 &#128400<h1>
                 ${many}
             </div>
             <div class="w-4/12 mb-10">
-                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 시간 상위 5인 &#128400<h1>
+                <h1 class="font-black text-3xl mt-10 mb-7">${month}월 [시간] 상위 5인 &#128400<h1>
                 ${long}
             </div>
             <div class="w-2/12">
@@ -284,76 +302,77 @@ module.exports = {
         return msg;
     },
     bulletin: function (boardTable) {
-        let msg = `<div id="board">
-        <!-- Main content header -->
-        <div class="mx-24 pt-3">
-            <div class="flex flex-col mb-7 mt-12 items-start justify-center space-y-4 border-b lg:items-center lg:space-y-0 lg:flex-row">
-                <h1 class="text-2xl font-semibold whitespace-nowrap text-gray-500">My board</h1>
-                <a class="m-2 block p-1.5 rounded-full transform transition hover:-rotate-12 duration-500" href="./modify/board">
-                    <svg class="h-6 fill-current h-8 w-8 text-black hover:text-red-700" role="img"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-                    </svg>
-                </a>
-            </div>
-        </div>
+        let msg = `<div class="w-full text-center flex">
+                    <div class="flex-1 w-6/12 p-5 overflow-hidden overflow-y-scroll text-center m-0" id="boardBox">
+                        <div class="flex flex-col">
+                            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="inline-block w-6/12 py-10 align-middle">
+                                    <div class="overflow-hidden border-b border-gray-200 rounded-md shadow-md">
+                                        <table class="min-w-full overflow-x-scroll divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-3/12">
+                                                        Date
+                                                    </th>
+                                                    <th scope="col"
+                                                        class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 w-9/12">
+                                                        Title
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                                
+                                                ${boardTable}
 
-        <div class="flex h-screen overflow-y-hidden bg-gray-200 px-16 pt-5 pb-16">
-
-            <div class="flex flex-col flex-1 h-5/6 overflow-hidden">
-                <!-- Main content -->
-                <main class="flex-1 max-h-full p-5 overflow-hidden overflow-y-scroll" id="boardBox">
-                    <div class="flex flex-col">
-                        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div class="inline-block min-w-full pb-2 align-middle sm:px-6 lg:px-8">
-                                <div class="overflow-hidden border-b border-gray-200 rounded-md shadow-md">
-                                    <table class="min-w-full overflow-x-scroll divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th scope="col"
-                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                    Title
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                    Category
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                                    Date
-                                                </th>
-                                                <th scope="col" class="relative px-6 py-3">
-                                                    <span class="sr-only">Edit</span>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
-                                            
-                                            ${boardTable}
-
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </main>
+                </div>
+            </div>`;
+
+        return msg;
+    },
+    board: function (title, date, content, file1, file2, file3) {
+        msg = `<!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                <title>WD3J 외출 현황</title>
+                <meta name="description" content="">
+                <meta name="keywords" content="">
+                <meta name="author" content="">
+                <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+            </head>
+            <body class="bg-blue-100 text-center">
+            <div class="w-full text-center">
+                <div class="w-full text-center font-black text-3xl mt-16 text-blue-700">
+                    <h1>${title}</h1>
+                </div>
+                <div class="w-full text-center mt-3" readonly>
+                    ${date}
+                </div>
+                <div class="w-full text-center m-0">
+                    <textarea class="w-72 h-52 resize-none overflow-y-auto" readonly>${content}</textarea>
+                </div>
+                <div class="w-full text-center">
+                    ${file1}
+                </div>
+                <div class="w-full text-center">
+                    ${file2}
+                </div>
+                <div class="w-full text-center">
+                    ${file3}
+                </div>
             </div>
-            <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.3/dist/alpine.min.js" defer></script>
-            <script>
-                const setup = () => {
-                    return {
-                        loading: true,
-                        isSidebarOpen: false,
-                        toggleSidbarMenu() {
-                            this.isSidebarOpen = !this.isSidebarOpen
-                        },
-                        isSettingsPanelOpen: false,
-                        isSearchBoxOpen: false,
-                    }
-                }
-            </script>
-        </div>`;
+            </body>
+        `;
 
         return msg;
     },

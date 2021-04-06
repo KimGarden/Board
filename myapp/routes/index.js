@@ -3,6 +3,20 @@ var router = express.Router();
 const db = require("../lib/db");
 var conf = require("../lib/conf");
 var temp = require("../lib/temp");
+var fs = require("fs");
+var path = require("path");
+var mime = require("mime");
+var multer = require("multer");
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, "../public/images");
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.originalname);
+        },
+    }),
+}); //dest : 저장 위치 (root에서 시작된다)
 
 router.use(express.urlencoded({ extended: false }));
 
@@ -66,6 +80,7 @@ router.post("/login", function (req, res, next) {
     let info = "";
     let inOut = "";
     let allList = "";
+    let bulletin = "";
     let sumTime1 = 0;
     let sumTime2 = 0;
 
@@ -217,31 +232,72 @@ router.post("/login", function (req, res, next) {
                                         }
 
                                         db.query(`SELECT * FROM user`, function (error4, result4) {
-                                            let allPeople = "";
-                                            for (let i = 0; i < result4.length; i++) {
-                                                if (result4[i].inClass == 0) {
-                                                    allPeople += `
+                                            if (error4) {
+                                                throw error4;
+                                            } else {
+                                                let allPeople = "";
+                                                for (let i = 0; i < result4.length; i++) {
+                                                    if (result4[i].inClass == 0) {
+                                                        allPeople += `
                                                                 <div
                                                                     class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
                                                                     ${result4[i].name} (${result4[i].count}) (${result4[i].lastReason})
                                                                 </div>
                                                             `;
+                                                    }
                                                 }
-                                            }
-                                            for (let i = 0; i < result4.length; i++) {
-                                                if (result4[i].inClass == 1) {
-                                                    allPeople += `
+                                                for (let i = 0; i < result4.length; i++) {
+                                                    if (result4[i].inClass == 1) {
+                                                        allPeople += `
                                                                 <div
                                                                     class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
                                                                     ${result4[i].name} (${result4[i].count})
                                                                 </div>
                                                             `;
+                                                    }
                                                 }
+                                                allPeople += `<div class="mb-10"></div>`;
+                                                allList = temp.allList(allPeople);
+
+                                                db.query(
+                                                    `SELECT * FROM bulletin ORDER BY date DESC`,
+                                                    function (error5, results5) {
+                                                        if (error5) {
+                                                            throw error5;
+                                                        } else {
+                                                            let bulletinMsg = "";
+                                                            for (
+                                                                let i = 0;
+                                                                i < results5.length;
+                                                                i++
+                                                            ) {
+                                                                bulletinMsg += `
+                                                                <tr class="transition-all hover:bg-gray-100 hover:shadow-lg" onClick="location.href='${conf.Address}board/${results5[i].id}'">
+                                                                    <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
+                                                                        <a class="cursor-default text-sm text-gray-900">${results5[i].date}</a>
+                                                                    </td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
+                                                                        <span
+                                                                            class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                                                            ${results5[i].title}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                                `;
+                                                            }
+                                                            bulletin = temp.bulletin(bulletinMsg);
+                                                            resultHTML = temp.main(
+                                                                info,
+                                                                inOut,
+                                                                allList,
+                                                                "",
+                                                                bulletin
+                                                            );
+                                                            res.send(resultHTML);
+                                                        }
+                                                    }
+                                                );
                                             }
-                                            allPeople += `<div class="mb-40"></div>`;
-                                            allList = temp.allList(allPeople);
-                                            resultHTML = temp.main(info, inOut, allList, "");
-                                            res.send(resultHTML);
                                         }); // result4 query문 종료
                                     }
                                 } // result3 fucntion 종료
@@ -529,7 +585,7 @@ router.get("/pro/:date", function (req, res, next) {
                                                         monthlyArrTime[i] = monthlyArrTime[j];
                                                         monthlyArrTime[j] = tempTime1;
                                                         tempTime2 = nameArrTime[i];
-                                                        nameArrTime[i] = nameArr[j];
+                                                        nameArrTime[i] = nameArrTime[j];
                                                         nameArrTime[j] = tempTime2;
                                                     }
                                                 }
@@ -581,7 +637,7 @@ router.get("/pro/:date", function (req, res, next) {
                                                 `;
                                             }
                                             rank = temp.rank(rankMsgRecord, rankMsgTime, month);
-                                            resultHTML = temp.main(rank, "", allList, chart);
+                                            resultHTML = temp.main(rank, "", allList, chart, "");
                                             res.send(resultHTML);
                                         }
                                     });
@@ -784,6 +840,97 @@ router.post("/resetData", function (req, res, next) {
 
 router.post("/changeDate", function (req, res, next) {
     res.redirect(`${conf.Address}pro/${req.body.date}`);
+});
+
+router.get("/board/:boardId", function (req, res, next) {
+    db.query(`SELECT * FROM bulletin WHERE id=?`, [req.params.boardId], function (error, results) {
+        let fileMsg1 =
+            results[0].file1 == null
+                ? ""
+                : `<h1 class="xl font-black mt-3">${results[0].file1}</h1>
+        <form action="${conf.Address}down" method="post">
+            <input type="hidden" name="file" value="${results[0].file1}">
+            <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+        </form>`;
+        let fileMsg2 =
+            results[0].file2 == null
+                ? ""
+                : `<h1 class="xl font-black mt-3">${results[0].file2}</h1>
+        <form action="${conf.Address}down" method="post">
+            <input type="hidden" name="file" value="${results[0].file2}">
+            <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+        </form>`;
+        let fileMsg3 =
+            results[0].file3 == null
+                ? ""
+                : `<h1 class="xl font-black mt-3">${results[0].file3}</h1>
+        <form action="${conf.Address}down" method="post">
+            <input type="hidden" name="file" value="${results[0].file3}">
+            <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
+        </form>`;
+        let msg = temp.board(
+            results[0].title,
+            results[0].date,
+            results[0].content,
+            fileMsg1,
+            fileMsg2,
+            fileMsg3
+        );
+        res.send(msg);
+    });
+});
+
+router.post("/down", function (req, res, next) {
+    const upload_folder = "../public/images/";
+    const file = upload_folder + req.body.file; // ex) /upload/files/sample.txt
+
+    try {
+        if (fs.existsSync(file)) {
+            // 파일이 존재하는지 체크
+            var filename = path.basename(file); // 파일 경로에서 파일명(확장자포함)만 추출
+            var mimetype = mime.getType(file); // 파일의 타입(형식)을 가져옴
+
+            res.setHeader("Content-disposition", "attachment; filename=" + filename); // 다운받아질 파일명 설정
+            res.setHeader("Content-type", mimetype); // 파일 형식 지정
+
+            var filestream = fs.createReadStream(file);
+            filestream.pipe(res).on("finish", () => {
+                console.log("download complete");
+            });
+        } else {
+            res.send("해당 파일이 없습니다.");
+            return;
+        }
+    } catch (e) {
+        // 에러 발생시
+        console.log(e);
+        res.send("파일을 다운로드하는 중에 에러가 발생하였습니다.");
+        return;
+    }
+});
+
+router.post("/upload", upload.array("file"), function (req, res, next) {
+    const title = req.body.title;
+    const content = req.body.content;
+    files = [];
+    files[0] = null;
+    files[1] = null;
+    files[2] = null;
+    for (let i = 0; i < req.files.length; i++) {
+        files[i] = req.files[i].filename;
+    }
+
+    db.query(
+        `INSERT INTO bulletin(title, content, date, year, month, day, file1, file2, file3) VALUES (?, ?, now(), ?, ?, ?, ?, ?, ?)`,
+        [title, content, year, month, day, files[0], files[1], files[2]],
+        function (error, reuslts) {
+            if (error) {
+                throw error;
+            } else {
+                res.send("ok");
+            }
+        }
+    );
 });
 
 module.exports = router;
