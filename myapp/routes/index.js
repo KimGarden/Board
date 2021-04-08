@@ -13,7 +13,7 @@ const upload = multer({
             cb(null, "../public/images");
         },
         filename: function (req, file, cb) {
-            cb(null, file.originalname);
+            cb(null, `${Date.now()}__${file.originalname}`);
         },
     }),
 }); //dest : 저장 위치 (root에서 시작된다)
@@ -240,7 +240,7 @@ router.post("/login", function (req, res, next) {
                                                     if (result4[i].inClass == 0) {
                                                         allPeople += `
                                                                 <div
-                                                                    class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
+                                                                    class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
                                                                     ${result4[i].name} (${result4[i].count}) (${result4[i].lastReason})
                                                                 </div>
                                                             `;
@@ -250,14 +250,14 @@ router.post("/login", function (req, res, next) {
                                                     if (result4[i].inClass == 1) {
                                                         allPeople += `
                                                                 <div
-                                                                    class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
+                                                                    class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
                                                                     ${result4[i].name} (${result4[i].count})
                                                                 </div>
                                                             `;
                                                     }
                                                 }
                                                 allPeople += `<div class="mb-10"></div>`;
-                                                allList = temp.allList(allPeople);
+                                                allList = temp.allList(allPeople, allPeople);
 
                                                 db.query(
                                                     `SELECT * FROM bulletin ORDER BY date DESC`,
@@ -271,15 +271,27 @@ router.post("/login", function (req, res, next) {
                                                                 i < results5.length;
                                                                 i++
                                                             ) {
+                                                                let title = results5[i].title;
+                                                                let titleM = results5[i].title;
+                                                                if (title.length > 15) {
+                                                                    title =
+                                                                        title.substring(0, 15) +
+                                                                        "...";
+                                                                }
+
                                                                 bulletinMsg += `
-                                                                <tr class="transition-all hover:bg-gray-100 hover:shadow-lg" onClick="location.href='${conf.Address}board/${results5[i].id}'">
+                                                                <tr class="transition-all hover:bg-gray-100 hover:shadow-lg w-full" onClick="location.href='${conf.Address}board/${results5[i].id}'">
                                                                     <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
                                                                         <span
-                                                                            class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                                                                            ${results5[i].title}
+                                                                            class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-indigo-800 bg-indigo-100 rounded-full lg:hidden">
+                                                                            ${title}
+                                                                        </span>
+                                                                        <span
+                                                                            class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-indigo-800 bg-indigo-100 rounded-full hidden lg:block">
+                                                                            ${title}
                                                                         </span>
                                                                     </td>
-                                                                    <td class="px-6 py-4 whitespace-nowrap" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
+                                                                    <td class="px-6 py-4 whitespace-nowrap hidden lg:block" onClick="location.href='${conf.Address}/board/${results5[i].id}'">
                                                                         <a class="cursor-default text-sm text-gray-900">${results5[i].date}</a>
                                                                     </td>
                                                                 </tr>
@@ -433,6 +445,7 @@ router.get("/pro/:date", function (req, res, next) {
             throw error;
         } else {
             let allPeople = "";
+            let allPeopleM = "";
             for (let i = 0; i < result.length; i++) {
                 if (result[i].inClass == 0) {
                     allPeople += `
@@ -440,9 +453,15 @@ router.get("/pro/:date", function (req, res, next) {
                         <input type="hidden" name="userId" value="${result[i].id}">
                         <input type="hidden" name="userPassword" value="${result[i].password}">
                         <input type="hidden" name="userName" value="${result[i].name}">
-                        <input class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count}) (${result[i].lastReason})">
+                        <input class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count}) (${result[i].lastReason})">
                     </form>
                 `;
+                    allPeopleM += `
+                    <div
+                        class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
+                        ${result[i].name} (${result[i].count}) (${result[i].lastReason})
+                    </div>
+                    `;
                 }
             }
             for (let i = 0; i < result.length; i++) {
@@ -452,12 +471,18 @@ router.get("/pro/:date", function (req, res, next) {
                         <input type="hidden" name="userId" value="${result[i].id}">
                         <input type="hidden" name="userPassword" value="${result[i].password}">
                         <input type="hidden" name="userName" value="${result[i].name}">
-                        <input class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mr-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count})">
+                        <input class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count})">
                     </form>
                 `;
+                    allPeopleM += `
+                    <div
+                        class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
+                        ${result[i].name} (${result[i].count})
+                    </div>
+                    `;
                 }
             }
-            allList = temp.allList(allPeople);
+            allList = temp.allList(allPeople, allPeopleM);
             db.query(
                 `SELECT * FROM user LEFT JOIN countrecord ON user.id = countrecord.userId WHERE countrecord.date=?`,
                 [req.params.date],
@@ -709,7 +734,7 @@ router.post("/checkInfo", function (req, res, next) {
                                                         ${results2[i].reason}
                                                     </span>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
+                                                <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap hidden lg:block">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
                                                         ${result}분
@@ -749,7 +774,7 @@ router.post("/checkInfo", function (req, res, next) {
                                                         ${results2[i].reason}
                                                     </span>
                                                 </td>
-                                                <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
+                                                <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap hidden lg:block">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
                                                         ${result}분
@@ -777,7 +802,7 @@ router.post("/checkInfo", function (req, res, next) {
                                                     ${results2[results2.length - 1].reason}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
+                                            <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap hidden lg:block">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
                                                         진행 중
@@ -787,11 +812,11 @@ router.post("/checkInfo", function (req, res, next) {
                             }
                             pro = `
                                 <div class="w-full text-center mt-5">
-                                <button class="bg-red-600 text-white w-2/12 p-1 shadow-lg rounded-xl font-bold" onClick="location.href='${conf.Address}pro/${today}'">목록으로</button>
-                                <div>
+                                    <button class="bg-red-600 text-white w-2/12 p-1 shadow-lg rounded-xl font-bold" onClick="location.href='${conf.Address}pro/${today}'">목록으로</button>
+                                </div>
                             `;
                             info += temp.info(userName, todayData, pro);
-                            resultHTML = temp.main(info, "", "", "");
+                            resultHTML = temp.main(info, "", "", "", "");
                             res.send(resultHTML);
                         }
                     } // result2 function 종료
@@ -805,7 +830,10 @@ router.post("/resetData", function (req, res, next) {
     let date = req.body.date;
     let userPassword = req.body.userPassword;
     let arr = date.split("-");
-
+    console.log("userPassword");
+    console.log(userPassword);
+    console.log("conf");
+    console.log(conf.reset);
     if (userPassword == conf.reset) {
         db.query(`SELECT * FROM user`, function (error, results) {
             for (let i = 0; i < results.length; i++) {
@@ -833,7 +861,7 @@ router.post("/resetData", function (req, res, next) {
             );
         });
     } else {
-        res.write("<script language='javascript'>alert('Don't click this button')</script>");
+        res.write("<script language='javascript'>alert('Incorrect Password')</script>");
         res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
     }
 });
@@ -847,7 +875,7 @@ router.get("/board/:boardId", function (req, res, next) {
         let fileMsg1 =
             results[0].file1 == null
                 ? ""
-                : `<h1 class="xl font-black mt-3">${results[0].file1}</h1>
+                : `<h1 class="xl font-black mt-3">${results[0].file1.split("__")[1]}</h1>
         <form action="${conf.Address}down" method="post">
             <input type="hidden" name="file" value="${results[0].file1}">
             <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
@@ -855,7 +883,7 @@ router.get("/board/:boardId", function (req, res, next) {
         let fileMsg2 =
             results[0].file2 == null
                 ? ""
-                : `<h1 class="xl font-black mt-3">${results[0].file2}</h1>
+                : `<h1 class="xl font-black mt-3">${results[0].file2.split("__")[1]}</h1>
         <form action="${conf.Address}down" method="post">
             <input type="hidden" name="file" value="${results[0].file2}">
             <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
@@ -863,7 +891,7 @@ router.get("/board/:boardId", function (req, res, next) {
         let fileMsg3 =
             results[0].file3 == null
                 ? ""
-                : `<h1 class="xl font-black mt-3">${results[0].file3}</h1>
+                : `<h1 class="xl font-black mt-3">${results[0].file3.split("__")[1]}</h1>
         <form action="${conf.Address}down" method="post">
             <input type="hidden" name="file" value="${results[0].file3}">
             <input type="submit" value="다운" class="md:w-40 bg-indigo-600 hover:bg-blue-dark text-white font-bold py-3 px-6 rounded-lg mt-3 hover:bg-indigo-500 transition cursor-pointer ease-in-out duration-300 mx-auto">
@@ -912,7 +940,7 @@ router.post("/down", function (req, res, next) {
 router.post("/upload", upload.array("file"), function (req, res, next) {
     const title = req.body.title;
     const content = req.body.content;
-    files = [];
+    let files = [];
     files[0] = null;
     files[1] = null;
     files[2] = null;
@@ -927,10 +955,52 @@ router.post("/upload", upload.array("file"), function (req, res, next) {
             if (error) {
                 throw error;
             } else {
-                res.send("ok");
+                res.write("<script language='javascript'>alert('Upload successful')</script>");
+                res.write(
+                    `<script language='javascript'>window.location='${conf.Address}pro/${today}'</script>`
+                );
             }
         }
     );
+});
+
+router.post("/loginwho", function (req, res, next) {
+    let userId = req.body.userId;
+    let userPassword = req.body.userPassword;
+    let action = req.body.action;
+    console.log(action);
+
+    switch (action) {
+        case "학생 로그인":
+            res.send(`
+                <form name="form" action="${conf.Address}logincheck" method="post">
+                    <input type="hidden" name="userId" value="${userId}">
+                    <input type="hidden" name="userPassword" value="${userPassword}">
+                </form>
+                <script language="javascript">
+                    document.form.submit();
+                </script>`);
+            break;
+        case "교원 로그인":
+            res.send(`
+                <form name="form" action="${conf.Address}pro" method="post">
+                    <input type="hidden" name="userPassword" value="${userPassword}">
+                </form>
+                <script language="javascript">
+                    document.form.submit();
+                </script>`);
+            break;
+        case "관리자 페이지":
+            res.send(`
+                <form name="form" action="${conf.Address}resetData" method="post">
+                    <input type="hidden" name="date" value="${userId}">
+                    <input type="hidden" name="userPassword" value="${userPassword}">
+                </form>
+                <script language="javascript">
+                    document.form.submit();
+                </script>`);
+            break;
+    }
 });
 
 module.exports = router;
