@@ -13,10 +13,11 @@ module.exports = {
                 <meta name="keywords" content="">
                 <meta name="author" content="">
                 <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+                <link rel="icon" href="${conf.Address}images/logo.PNG">
             </head>
             <body class="bg-blue-100">
             </script>
-            <div class="font-sans w-9/12 mx-auto">
+            <div class="font-sans w-9/12 mx-auto my-auto">
                 <div class="relative min-h-screen flex flex-col sm:justify-center items-center mt-12 lg:mt-0">
                     <div class="relative sm:max-w-sm w-full">
                         <div class="card bg-blue-400 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-6"></div>
@@ -105,7 +106,7 @@ module.exports = {
         `;
         return msg;
     },
-    info: function (userName, record, pro) {
+    info: function (userName, record, pro, recordM) {
         msg = `
         <div class="card bg-blue-200 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-6 z-0 hidden lg:block"></div>
         <div class="card bg-red-200 shadow-lg w-full h-full rounded-3xl absolute transform rotate-6 z-0 hidden lg:block"></div>
@@ -161,7 +162,34 @@ module.exports = {
                 </div>
             </div>
             ${pro}
-        </div>`;
+        </div>
+        <h1 class="text-3xl font-bold py-8 text-center w-full lg:hidden">< ${userName} ></h1>
+        <div id="profile" class="max-w-4xl items-center w-11/12 flex-wrap mx-auto mb-16 flex h-72 overflow-hidden overflow-y-scroll lg:hidden">
+            <table class="min-w-full overflow-x-hidden divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr class="w-11/12">
+                        <th scope="col"
+                            class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
+                            <h1>나간 시간</h1>
+                            <hr class="my-1"></hr>
+                            <h1>들어온 시간</h1>
+                        </th>
+                        <th scope="col"
+                            class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
+                            <h1>사유</h1>
+                            <hr class="my-1"></hr>
+                            <h1>부재 시간</h1>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    
+                    ${recordM}
+
+                </tbody>
+            </table>
+        </div>
+        ${pro}`;
 
         return msg;
     },
@@ -312,7 +340,7 @@ module.exports = {
         return msg;
     },
     bulletin: function (boardTable) {
-        let msg = `<h1 class="font-black text-xl lg:text-3xl mb-3 block h-8 mt-28 text-center z-10">게시판</h1>
+        let msg = `<h1 class="font-black text-xl lg:text-3xl mb-3 block h-8 mt-28 text-center relative z-10">게시판</h1>
                 <div class="w-full text-center flex mb-16 relative">
                 <div class="card bg-pink-200 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-6 z-0 hidden lg:block"></div>
                 <div class="card bg-green-200 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-12 z-0 hidden lg:block"></div>
@@ -348,7 +376,6 @@ module.exports = {
                 </div>
             </div>
             `;
-
         return msg;
     },
     board: function (title, date, content, file1, file2, file3) {

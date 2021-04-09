@@ -43,6 +43,10 @@ router.get("/", function (req, res, next) {
     res.send(msg);
 });
 
+router.get("/login", function (req, res, next) {
+    res.redirect(`${conf.Address}`);
+});
+
 /* GET home page. */
 router.post("/logincheck", function (req, res, next) {
     let userId = req.body.userId;
@@ -83,6 +87,7 @@ router.post("/login", function (req, res, next) {
     let bulletin = "";
     let sumTime1 = 0;
     let sumTime2 = 0;
+    let reason = "";
 
     db.query(`SELECT password FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
@@ -96,11 +101,18 @@ router.post("/login", function (req, res, next) {
                         if (error2) {
                             throw error2;
                         } else {
-                            var today = " ";
+                            let today = "";
+                            let todayM = "";
                             if (results2.length == 0) {
                                 today += "기록이 없습니다";
                             } else if (results2.length % 2 == 0) {
                                 for (let i = 0; i < results2.length; i += 2) {
+                                    let reason = results2[i].reason;
+                                    if (reason.length > 8) {
+                                        reason = reason.substring(0, 8) + "...";
+                                    } else if (reason.length == 0) {
+                                        reason = "미등록";
+                                    }
                                     let arrOut = results2[i].time.split(" ");
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
@@ -138,6 +150,30 @@ router.post("/login", function (req, res, next) {
                                                     </span>
                                                 </td>
                                             </tr>`;
+                                    todayM += `
+                                            <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                                <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        ${results2[i].time}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        ${results2[i + 1].time}
+                                                    </div>
+                                                </td>
+                                                <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                        ${reason}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full text-center mt-2">
+                                                        ${sumTime1}분
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    `;
                                 }
                                 if (time != undefined) {
                                     db.query(`UPDATE user SET time=? WHERE id=?`, [
@@ -147,11 +183,17 @@ router.post("/login", function (req, res, next) {
                                 }
                             } else {
                                 for (let i = 0; i < results2.length - 1; i += 2) {
+                                    let reason = results2[i].reason;
+                                    if (reason.length > 8) {
+                                        reason = reason.substring(0, 8) + "...";
+                                    } else if (reason.length == 0) {
+                                        reason = "미등록";
+                                    }
                                     let arrOut = results2[i].time.split(" ");
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
                                     let timeIn = arrIn[1].split(":");
-                                    sumTime2 = Math.floor(
+                                    sumTime1 = Math.floor(
                                         ((timeIn[0] - timeOut[0]) * 3600 +
                                             (timeIn[1] - timeOut[1]) * 60 +
                                             (timeIn[2] - timeOut[2])) /
@@ -184,6 +226,30 @@ router.post("/login", function (req, res, next) {
                                                     </span>
                                                 </td>
                                             </tr>`;
+                                    todayM += `
+                                            <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                                <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        ${results2[i].time}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        ${results2[i + 1].time}
+                                                    </div>
+                                                </td>
+                                                <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                        ${reason}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full text-center mt-2">
+                                                        ${sumTime1}분
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    `;
                                 }
                                 today += `
                                         <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
@@ -207,13 +273,37 @@ router.post("/login", function (req, res, next) {
                                             </td>
                                             <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
                                                     <span
-                                                        class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
+                                                        class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full">
                                                         진행 중
                                                     </span>
                                                 </td>
                                         </tr>`;
+                                todayM += `
+                                        <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                            <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                    ${results2[results2.length - 1].time}
+                                                </div>
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
+                                                    진행 중
+                                                </div>
+                                            </td>
+                                            <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                    ${results2[results2.length - 1].reason}
+                                                </div>
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
+                                                    진행 중
+                                                </div>
+                                            </td>
+                                        </tr>
+                                `;
                             }
-                            info += temp.info(userName, today, "");
+                            info += temp.info(userName, today, "", todayM);
 
                             db.query(
                                 `SELECT inClass FROM user WHERE id=?`,
@@ -272,7 +362,6 @@ router.post("/login", function (req, res, next) {
                                                                 i++
                                                             ) {
                                                                 let title = results5[i].title;
-                                                                let titleM = results5[i].title;
                                                                 if (title.length > 15) {
                                                                     title =
                                                                         title.substring(0, 15) +
@@ -457,10 +546,12 @@ router.get("/pro/:date", function (req, res, next) {
                     </form>
                 `;
                     allPeopleM += `
-                    <div
-                        class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
-                        ${result[i].name} (${result[i].count}) (${result[i].lastReason})
-                    </div>
+                    <form action="${conf.Address}checkInfo" method="post" class="inline-block">
+                        <input type="hidden" name="userId" value="${result[i].id}">
+                        <input type="hidden" name="userPassword" value="${result[i].password}">
+                        <input type="hidden" name="userName" value="${result[i].name}">
+                        <input class="shadow-lg inline-block font-semibold leading-5 text-red-800 bg-red-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count}) (${result[i].lastReason})">
+                    </form>
                     `;
                 }
             }
@@ -475,11 +566,17 @@ router.get("/pro/:date", function (req, res, next) {
                     </form>
                 `;
                     allPeopleM += `
-                    <div
-                        class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
-                        ${result[i].name} (${result[i].count})
-                    </div>
+                    <form action="${conf.Address}checkInfo" method="post" class="inline-block">
+                        <input type="hidden" name="userId" value="${result[i].id}">
+                        <input type="hidden" name="userPassword" value="${result[i].password}">
+                        <input type="hidden" name="userName" value="${result[i].name}">
+                        <input class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5" type="submit" value="${result[i].name} (${result[i].count})">
+                    </form>
                     `;
+                    // <div
+                    //     class="shadow-lg inline-block font-semibold leading-5 text-green-800 bg-green-100 rounded-full mx-2 mb-2 py-0 px-3 text-xs font-semibold h-5">
+                    //     ${result[i].name} (${result[i].count})
+                    // </div>
                 }
             }
             allList = temp.allList(allPeople, allPeopleM);
@@ -695,7 +792,8 @@ router.post("/checkInfo", function (req, res, next) {
                         if (error2) {
                             throw error2;
                         } else {
-                            var todayData = " ";
+                            let todayData = "";
+                            let todayDataM = "";
                             if (results2.length == 0) {
                                 todayData += `
                                     <div class="m-3">
@@ -704,16 +802,22 @@ router.post("/checkInfo", function (req, res, next) {
                                 `;
                             } else if (results2.length % 2 == 0) {
                                 for (let i = 0; i < results2.length; i += 2) {
+                                    let reason = results2[i].reason;
+                                    if (reason.length > 8) {
+                                        reason = reason.substring(0, 8) + "...";
+                                    } else if (reason.length == 0) {
+                                        reason = "미등록";
+                                    }
                                     let arrOut = results2[i].time.split(" ");
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
                                     let timeIn = arrIn[1].split(":");
-                                    let result = (
+                                    let result = Math.floor(
                                         ((timeIn[0] - timeOut[0]) * 3600 +
                                             (timeIn[1] - timeOut[1]) * 60 +
                                             (timeIn[2] - timeOut[2])) /
-                                        60
-                                    ).toFixed(1);
+                                            60
+                                    );
                                     todayData += `
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-6 py-4 text-left whitespace-nowrap">
@@ -741,19 +845,49 @@ router.post("/checkInfo", function (req, res, next) {
                                                     </span>
                                                 </td>
                                             </tr>`;
+                                    todayDataM += `
+                                            <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                                <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        ${results2[i].time}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        ${results2[i + 1].time}
+                                                    </div>
+                                                </td>
+                                                <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                        ${reason}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full text-center mt-2">
+                                                        ${result}분
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    `;
                                 }
                             } else {
                                 for (let i = 0; i < results2.length - 1; i += 2) {
+                                    let reason = results2[i].reason;
+                                    if (reason.length > 8) {
+                                        reason = reason.substring(0, 8) + "...";
+                                    } else if (reason.length == 0) {
+                                        reason = "미등록";
+                                    }
                                     let arrOut = results2[i].time.split(" ");
                                     let arrIn = results2[i + 1].time.split(" ");
                                     let timeOut = arrOut[1].split(":");
                                     let timeIn = arrIn[1].split(":");
-                                    let result = (
+                                    let result = Math.floor(
                                         ((timeIn[0] - timeOut[0]) * 3600 +
                                             (timeIn[1] - timeOut[1]) * 60 +
                                             (timeIn[2] - timeOut[2])) /
-                                        60
-                                    ).toFixed(1);
+                                            60
+                                    );
                                     todayData += `
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-6 py-4 text-left whitespace-nowrap">
@@ -781,6 +915,30 @@ router.post("/checkInfo", function (req, res, next) {
                                                     </span>
                                                 </td>
                                             </tr>`;
+                                    todayDataM += `
+                                            <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                                <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        ${results2[i].time}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        ${results2[i + 1].time}
+                                                    </div>
+                                                </td>
+                                                <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                    <div
+                                                        class="cursor-default text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                        ${reason}
+                                                    </div>
+                                                    <div
+                                                        class="cursor-default text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full text-center mt-2">
+                                                        ${result}분
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                    `;
                                 }
                                 todayData += `
                                         <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
@@ -809,13 +967,37 @@ router.post("/checkInfo", function (req, res, next) {
                                                     </span>
                                                 </td>
                                         </tr>`;
+                                todayDataM += `
+                                        <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
+                                            <td class="px-1 py-4 text-left whitespace-nowrap">
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                    ${results2[results2.length - 1].time}
+                                                </div>
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
+                                                    진행 중
+                                                </div>
+                                            </td>
+                                            <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
+                                                    ${results2[results2.length - 1].reason}
+                                                </div>
+                                                <div
+                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
+                                                    진행 중
+                                                </div>
+                                            </td>
+                                        </tr>
+                                `;
                             }
                             pro = `
                                 <div class="w-full text-center mt-5">
-                                    <button class="bg-red-600 text-white w-2/12 p-1 shadow-lg rounded-xl font-bold" onClick="location.href='${conf.Address}pro/${today}'">목록으로</button>
+                                    <button class="bg-red-600 text-white w-4/12 p-1 shadow-lg rounded-xl font-bold" onClick="location.href='${conf.Address}pro/${today}'">목록으로</button>
                                 </div>
                             `;
-                            info += temp.info(userName, todayData, pro);
+                            info += temp.info(userName, todayData, pro, todayDataM);
                             resultHTML = temp.main(info, "", "", "", "");
                             res.send(resultHTML);
                         }
@@ -968,39 +1150,43 @@ router.post("/loginwho", function (req, res, next) {
     let userId = req.body.userId;
     let userPassword = req.body.userPassword;
     let action = req.body.action;
-    console.log(action);
 
-    switch (action) {
-        case "학생 로그인":
-            res.send(`
-                <form name="form" action="${conf.Address}logincheck" method="post">
-                    <input type="hidden" name="userId" value="${userId}">
-                    <input type="hidden" name="userPassword" value="${userPassword}">
-                </form>
-                <script language="javascript">
-                    document.form.submit();
-                </script>`);
-            break;
-        case "교원 로그인":
-            res.send(`
-                <form name="form" action="${conf.Address}pro" method="post">
-                    <input type="hidden" name="userPassword" value="${userPassword}">
-                </form>
-                <script language="javascript">
-                    document.form.submit();
-                </script>`);
-            break;
-        case "관리자 페이지":
-            res.send(`
-                <form name="form" action="${conf.Address}resetData" method="post">
-                    <input type="hidden" name="date" value="${userId}">
-                    <input type="hidden" name="userPassword" value="${userPassword}">
-                </form>
-                <script language="javascript">
-                    document.form.submit();
-                </script>`);
-            break;
-    }
+    db.query(`SELECT name FROM user WHERE id=?`, [userId], function (error, results) {
+        switch (action) {
+            case "학생 로그인":
+                console.log(results[0].name + " 학생 로그인");
+                res.send(`
+                    <form name="form" action="${conf.Address}logincheck" method="post">
+                        <input type="hidden" name="userId" value="${userId}">
+                        <input type="hidden" name="userPassword" value="${userPassword}">
+                    </form>
+                    <script language="javascript">
+                        document.form.submit();
+                    </script>`);
+                break;
+            case "교원 로그인":
+                console.log("교수님 로그인");
+                res.send(`
+                    <form name="form" action="${conf.Address}pro" method="post">
+                        <input type="hidden" name="userPassword" value="${userPassword}">
+                    </form>
+                    <script language="javascript">
+                        document.form.submit();
+                    </script>`);
+                break;
+            case "관리자 페이지":
+                console.log("관리자 처리");
+                res.send(`
+                    <form name="form" action="${conf.Address}resetData" method="post">
+                        <input type="hidden" name="date" value="${userId}">
+                        <input type="hidden" name="userPassword" value="${userPassword}">
+                    </form>
+                    <script language="javascript">
+                        document.form.submit();
+                    </script>`);
+                break;
+        }
+    });
 });
 
 module.exports = router;
