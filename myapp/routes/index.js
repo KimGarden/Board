@@ -87,7 +87,6 @@ router.post("/login", function (req, res, next) {
     let bulletin = "";
     let sumTime1 = 0;
     let sumTime2 = 0;
-    let reason = "";
 
     db.query(`SELECT password FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
@@ -407,10 +406,7 @@ router.post("/login", function (req, res, next) {
                     } // result2 function 종료
                 ); // result2 query문 종료
             } else {
-                res.write("<script language='javascript'>alert('Incorrect Password')</script>");
-                res.write(
-                    "<script language='javascript'>window.location='" + conf.Address + "'</script>"
-                );
+                res.redirect(`${conf.Address}`);
             }
         }
     });
@@ -513,8 +509,7 @@ router.post("/pro", function (req, res, next) {
     if (userPassword == conf.professor) {
         res.redirect(`${conf.Address}pro/${today}`);
     } else {
-        res.write("<script language='javascript'>alert('Incorrect Password')</script>");
-        res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
+        res.redirect(`${conf.Address}`);
     }
 });
 
@@ -1043,8 +1038,7 @@ router.post("/resetData", function (req, res, next) {
             );
         });
     } else {
-        res.write("<script language='javascript'>alert('Incorrect Password')</script>");
-        res.write("<script language='javascript'>window.location='" + conf.Address + "'</script>");
+        res.redirect(`${conf.Address}`);
     }
 });
 
@@ -1152,10 +1146,13 @@ router.post("/loginwho", function (req, res, next) {
     let action = req.body.action;
 
     db.query(`SELECT name FROM user WHERE id=?`, [userId], function (error, results) {
-        switch (action) {
-            case "학생 로그인":
-                console.log(results[0].name + " 학생 로그인");
-                res.send(`
+        if (results.length == 0 && action == "학생 로그인") {
+            res.redirect(`${conf.Address}`);
+        } else {
+            switch (action) {
+                case "학생 로그인":
+                    console.log(results[0].name + " 학생 로그인");
+                    res.send(`
                     <form name="form" action="${conf.Address}logincheck" method="post">
                         <input type="hidden" name="userId" value="${userId}">
                         <input type="hidden" name="userPassword" value="${userPassword}">
@@ -1163,20 +1160,20 @@ router.post("/loginwho", function (req, res, next) {
                     <script language="javascript">
                         document.form.submit();
                     </script>`);
-                break;
-            case "교원 로그인":
-                console.log("교수님 로그인");
-                res.send(`
+                    break;
+                case "교원 로그인":
+                    console.log("교수님 로그인");
+                    res.send(`
                     <form name="form" action="${conf.Address}pro" method="post">
                         <input type="hidden" name="userPassword" value="${userPassword}">
                     </form>
                     <script language="javascript">
                         document.form.submit();
                     </script>`);
-                break;
-            case "관리자 페이지":
-                console.log("관리자 처리");
-                res.send(`
+                    break;
+                case "관리자 페이지":
+                    console.log("관리자 처리");
+                    res.send(`
                     <form name="form" action="${conf.Address}resetData" method="post">
                         <input type="hidden" name="date" value="${userId}">
                         <input type="hidden" name="userPassword" value="${userPassword}">
@@ -1184,7 +1181,8 @@ router.post("/loginwho", function (req, res, next) {
                     <script language="javascript">
                         document.form.submit();
                     </script>`);
-                break;
+                    break;
+            }
         }
     });
 });

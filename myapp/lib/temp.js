@@ -144,7 +144,7 @@ module.exports = {
                                                     사유
                                                 </th>
                                                 <th scope="col"
-                                                    class="py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase hidden lg:block">
+                                                    class="px-6 py-3 text-xs font-medium tracking-wider text-center text-gray-500 uppercase hidden lg:block">
                                                     부재 시간
                                                 </th>
                                             </tr>
