@@ -51,28 +51,44 @@ router.get("/login", function (req, res, next) {
 router.post("/logincheck", function (req, res, next) {
     let userId = req.body.userId;
     let userPassword = req.body.userPassword;
-    db.query(`SELECT * FROM user WHERE id=?`, [userId], function (error, results) {
-        if (error) {
-            throw error;
-        } else {
-            if (results.length == 0) {
-                res.write("<script language='javascript'>alert('Incorrect Id')</script>");
-                res.write(
-                    "<script language='javascript'>window.location='" + conf.Address + "'</script>"
-                );
+    var pattern_num = /[0-9]/; // 숫자
+    var pattern_eng = /[a-zA-Z]/; // 문자
+    var pattern_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
+    var pattern_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
+    if (
+        pattern_num.test(userId) &&
+        !pattern_eng.test(userId) &&
+        !pattern_spc.test(userId) &&
+        !pattern_kor.test(userId)
+    ) {
+        console.log("Number validation success");
+        db.query(`SELECT * FROM user WHERE id=?`, [userId], function (error, results) {
+            if (error) {
+                throw error;
             } else {
-                res.send(`
-                <form name="form" action="${conf.Address}login" method="post">
-                    <input type="hidden" name="userId" value="${userId}">
-                    <input type="hidden" name="userPassword" value="${userPassword}">
-                    <input type="hidden" name="userName" value="${results[0].name}">
-                </form>
-                <script language="javascript">
-                    document.form.submit();
-                </script>`);
+                if (results.length == 0) {
+                    res.write("<script language='javascript'>alert('Incorrect Id')</script>");
+                    res.write(
+                        "<script language='javascript'>window.location='" +
+                            conf.Address +
+                            "'</script>"
+                    );
+                } else {
+                    res.send(`
+                    <form name="form" action="${conf.Address}login" method="post">
+                        <input type="hidden" name="userId" value="${userId}">
+                        <input type="hidden" name="userPassword" value="${userPassword}">
+                        <input type="hidden" name="userName" value="${results[0].name}">
+                    </form>
+                    <script language="javascript">
+                        document.form.submit();
+                    </script>`);
+                }
             }
-        }
-    });
+        });
+    } else {
+        res.redirect(`${conf.Address}`);
+    }
 });
 
 router.post("/login", function (req, res, next) {
@@ -87,6 +103,7 @@ router.post("/login", function (req, res, next) {
     let bulletin = "";
     let sumTime1 = 0;
     let sumTime2 = 0;
+    let reason = "";
 
     db.query(`SELECT password FROM user WHERE id=?`, [userId], function (error, results) {
         if (error) {
@@ -106,7 +123,7 @@ router.post("/login", function (req, res, next) {
                                 today += "기록이 없습니다";
                             } else if (results2.length % 2 == 0) {
                                 for (let i = 0; i < results2.length; i += 2) {
-                                    let reason = results2[i].reason;
+                                    reason = results2[i].reason;
                                     if (reason.length > 8) {
                                         reason = reason.substring(0, 8) + "...";
                                     } else if (reason.length == 0) {
@@ -139,7 +156,7 @@ router.post("/login", function (req, res, next) {
                                                 <td class="px-6 py-4 text-sm font-medium text-left whitespace-nowrap">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
-                                                        ${results2[i].reason}
+                                                        ${reason}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
@@ -153,11 +170,11 @@ router.post("/login", function (req, res, next) {
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-1 py-4 text-left whitespace-nowrap">
                                                     <div
-                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        class="cursor-default px-1 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
                                                         ${results2[i].time}
                                                     </div>
                                                     <div
-                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        class="cursor-default px-1 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
                                                         ${results2[i + 1].time}
                                                     </div>
                                                 </td>
@@ -182,7 +199,7 @@ router.post("/login", function (req, res, next) {
                                 }
                             } else {
                                 for (let i = 0; i < results2.length - 1; i += 2) {
-                                    let reason = results2[i].reason;
+                                    reason = results2[i].reason;
                                     if (reason.length > 8) {
                                         reason = reason.substring(0, 8) + "...";
                                     } else if (reason.length == 0) {
@@ -215,7 +232,7 @@ router.post("/login", function (req, res, next) {
                                                 <td class="px-6 py-4 text-sm font-medium text-left whitespace-nowrap">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
-                                                        ${results2[i].reason}
+                                                        ${reason}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
@@ -229,11 +246,11 @@ router.post("/login", function (req, res, next) {
                                             <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                                 <td class="px-1 py-4 text-left whitespace-nowrap">
                                                     <div
-                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                        class="cursor-default px-1 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
                                                         ${results2[i].time}
                                                     </div>
                                                     <div
-                                                        class="cursor-default px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
+                                                        class="cursor-default px-1 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full text-center mt-2">
                                                         ${results2[i + 1].time}
                                                     </div>
                                                 </td>
@@ -267,7 +284,7 @@ router.post("/login", function (req, res, next) {
                                             <td class="px-6 py-4 text-sm font-medium text-left whitespace-nowrap">
                                                 <span
                                                     class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
-                                                    ${results2[results2.length - 1].reason}
+                                                    ${reason}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
@@ -281,18 +298,18 @@ router.post("/login", function (req, res, next) {
                                         <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                             <td class="px-1 py-4 text-left whitespace-nowrap">
                                                 <div
-                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
+                                                    class="cursor-default px-1 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full text-center">
                                                     ${results2[results2.length - 1].time}
                                                 </div>
                                                 <div
-                                                    class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
+                                                    class="cursor-default px-1 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">
                                                     진행 중
                                                 </div>
                                             </td>
                                             <td class="px-1 py-4 text-sm font-medium text-left whitespace-nowrap">
                                                 <div
                                                     class="cursor-default px-2 text-xs font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full text-center">
-                                                    ${results2[results2.length - 1].reason}
+                                                    ${reason}
                                                 </div>
                                                 <div
                                                     class="cursor-default px-2 text-xs font-semibold leading-5 text-purple-800 bg-purple-100 rounded-full text-center mt-2">

@@ -8,7 +8,7 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>WD3J 외출 현황</title>
+                <title>トラタニジマ</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
@@ -23,8 +23,8 @@ module.exports = {
                         <div class="card bg-blue-400 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-6"></div>
                         <div class="card bg-red-400 shadow-lg w-full h-full rounded-3xl absolute transform rotate-6"></div>
                         <div class="relative w-full rounded-3xl px-6 py-4 bg-gray-100 shadow-md">
-                            <label for="" class="block text-lg text-gray-700 text-center font-semibold">
-                                WD3J 외출 현황 관리
+                            <label for="" class="block text-xl text-gray-700 text-center text-blue-400">
+                                虎谷島
                             </label>
                             <form action="${conf.Address}loginwho" method="post" class="mt-10">
                                 <div>
@@ -80,12 +80,13 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>WD3J 외출 현황</title>
+                <title>トラタニジマ</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
                 <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
+                <link rel="icon" href="${conf.Address}images/logo.PNG">
             </head>
             <body class="w-screen bg-blue-100 overflow-x-hidden">
 
@@ -169,13 +170,13 @@ module.exports = {
                 <thead class="bg-gray-50">
                     <tr class="w-11/12">
                         <th scope="col"
-                            class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
+                            class="w-6/12 px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
                             <h1>나간 시간</h1>
                             <hr class="my-1"></hr>
                             <h1>들어온 시간</h1>
                         </th>
                         <th scope="col"
-                            class="px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
+                            class="w-6/12px-1 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-center">
                             <h1>사유</h1>
                             <hr class="my-1"></hr>
                             <h1>부재 시간</h1>
@@ -298,11 +299,11 @@ module.exports = {
                 <div class="card bg-purple-200 shadow-lg w-full h-full rounded-3xl absolute transform rotate-6 z-0 hidden lg:block"></div>
             </div>
             <h1 class="font-black text-xl lg:text-3xl mb-7 relative">게시글 작성</h1>
-            <h1 class="relative">제목</h1>
+            <h1 class="relative font-black">제목</h1>
             <div>
                 <input type="text" name="title" class="w-60 mt-2 py-3 px-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none shadow-xl relative">
             </div>
-            <h1 class="relative">내용</h1>
+            <h1 class="relative font-black mt-3">내용</h1>
             <div>
                 <textarea name="content" class="w-80 h-96 mt-2 py-3 px-3 overflow-y-auto rounded-lg bg-white dark:bg-gray-800 border border-gray-400 dark:border-gray-700 text-gray-800 font-semibold focus:border-indigo-500 focus:outline-none resize-none shadow-xl relative"></textarea>
             </div>
@@ -385,11 +386,12 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>WD3J 외출 현황</title>
+                <title>トラタニジマ</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
                 <link rel="stylesheet" href="https://unpkg.com/tailwindcss/dist/tailwind.min.css">
+                <link rel="icon" href="${conf.Address}images/logo.PNG">
             </head>
             <body class="bg-blue-100 text-center w-full">
             <div class="w-full text-center">
