@@ -8,7 +8,7 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>トラタニジマ</title>
+                <title>WDJ 입출입 현황</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
@@ -24,7 +24,7 @@ module.exports = {
                         <div class="card bg-red-400 shadow-lg w-full h-full rounded-3xl absolute transform rotate-6"></div>
                         <div class="relative w-full rounded-3xl px-6 py-4 bg-gray-100 shadow-md">
                             <label for="" class="block text-xl text-gray-700 text-center text-blue-400">
-                                虎谷島
+                                WDJ 입출입 현황
                             </label>
                             <form action="${conf.Address}loginwho" method="post" class="mt-10">
                                 <div>
@@ -80,7 +80,7 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>トラタニジマ</title>
+                <title>WDJ 입출입 현황</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">
@@ -196,7 +196,7 @@ module.exports = {
     },
     in: function (userId, userPassword, userName) {
         msg = `
-        <div class="text-center mt-60 mb-36 relative">
+        <div class="text-center mt-28 mb-28 relative">
             <h1 class="font-black text-xl lg:text-3xl mb-3">현황 갱신</h1>
             <h1 class="font-black mb-3 text-red-500 text-sm">교실로 돌아오셨으면 아래의 버튼을 눌러주세요<h1>
             <div class="mb-24">
@@ -343,7 +343,7 @@ module.exports = {
     bulletin: function (boardTable) {
         let msg = `<h1 class="font-black text-xl lg:text-3xl mb-3 block h-8 mt-28 text-center relative z-10">게시판</h1>
                 <div class="w-full text-center flex mb-16 relative">
-                <div class="card bg-pink-200 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-6 z-0 hidden lg:block"></div>
+                <div class="card bg-pink-200 shadow-lg w-full h-full rounded-3xl absolute transform z-0 hidden lg:block"></div>
                 <div class="card bg-green-200 shadow-lg w-full h-full rounded-3xl absolute transform -rotate-12 z-0 hidden lg:block"></div>
                     <div class="flex-1 w-6/12 p-5 h-72 overflow-hidden overflow-y-scroll text-center m-0 z-10" id="boardBox">
                         <div class="flex flex-col">
@@ -386,7 +386,7 @@ module.exports = {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>トラタニジマ</title>
+                <title>WDJ 입출입 현황</title>
                 <meta name="description" content="">
                 <meta name="keywords" content="">
                 <meta name="author" content="">

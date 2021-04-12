@@ -267,6 +267,12 @@ router.post("/login", function (req, res, next) {
                                             </tr>
                                     `;
                                 }
+                                reason = results2[results2.length - 1].reason;
+                                if (reason.length > 8) {
+                                    reason = reason.substring(0, 8) + "...";
+                                } else if (reason.length == 0) {
+                                    reason = "미등록";
+                                }
                                 today += `
                                         <tr class="transition-all hover:bg-gray-100 hover:shadow-lg">
                                             <td class="px-6 py-4 text-left whitespace-nowrap">
@@ -472,7 +478,11 @@ router.post("/leave", function (req, res, next) {
     const userId = req.body.userId;
     const userPassword = req.body.userPassword;
     const userName = req.body.userName;
-    const reason = req.body.reason;
+    let reason = req.body.reason;
+
+    if (reason.length == 0) {
+        reason = "미등록";
+    }
 
     db.query(`UPDATE user SET inClass=0 WHERE id=?`, [userId], function (error, results) {
         if (error) {
