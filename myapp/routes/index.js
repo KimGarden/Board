@@ -7,6 +7,7 @@ var fs = require("fs");
 var path = require("path");
 var mime = require("mime");
 var multer = require("multer");
+var getDownloadFilename = require("../lib/getDownloadFilename").getDownloadFilename;
 const upload = multer({
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
@@ -24,20 +25,21 @@ var today = "";
 var year = "";
 var month = "";
 var day = "";
-db.query(`SELECT now() AS today`, function (error, results) {
-    if (error) {
-        throw error;
-    } else {
-        let todayData = results[0].today.split(" ");
-        today = todayData[0];
-        let arr = todayData[0].split("-");
-        year = arr[0];
-        month = arr[1];
-        day = arr[2];
-    }
-});
 
 router.get("/", function (req, res, next) {
+    db.query(`SELECT now() AS today`, function (error, results) {
+        if (error) {
+            throw error;
+        } else {
+            let todayData = results[0].today.split(" ");
+            today = todayData[0];
+            let arr = todayData[0].split("-");
+            year = arr[0];
+            month = arr[1];
+            day = arr[2];
+        }
+    });
+    console.log("현재 : " + today);
     let msg = "";
     msg = temp.checkPassword();
     res.send(msg);
@@ -238,7 +240,7 @@ router.post("/login", function (req, res, next) {
                                                 <td class="px-6 py-4 text-sm font-medium text-center whitespace-nowrap">
                                                     <span
                                                         class="cursor-default inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
-                                                        ${sumTime2}분
+                                                        ${sumTime1}분
                                                     </span>
                                                 </td>
                                             </tr>`;
@@ -1121,13 +1123,14 @@ router.post("/down", function (req, res, next) {
             var filename = path.basename(file); // 파일 경로에서 파일명(확장자포함)만 추출
             var mimetype = mime.getType(file); // 파일의 타입(형식)을 가져옴
 
-            res.setHeader("Content-disposition", "attachment; filename=" + filename); // 다운받아질 파일명 설정
+            res.setHeader(
+                "Content-disposition",
+                "attachment; filename=" + getDownloadFilename(req, filename)
+            ); // 다운받아질 파일명 설정
             res.setHeader("Content-type", mimetype); // 파일 형식 지정
 
             var filestream = fs.createReadStream(file);
-            filestream.pipe(res).on("finish", () => {
-                console.log("download complete");
-            });
+            filestream.pipe(res);
         } else {
             res.send("해당 파일이 없습니다.");
             return;
